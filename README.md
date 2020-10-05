@@ -11,11 +11,11 @@ Published at ECCV, 2020
 
 **Paper:** [arxiv.org/abs/2007.12146](https://arxiv.org/abs/2007.12146)
 
-**Project Page:** [yashkant.github.io/projects/spat-textvqa](https://yashkant.github.io/projects/spat-textvqa.html)
+**Project Page:** [yashkant.github.io/projects/sam-textvqa](https://yashkant.github.io/projects/sam-textvqa.html)
 
 We propose a novel spatially aware self-attention layer such that each visual entity only looks at neighboring entities defined by a spatial graph and use it to solve TextVQA.
 <p align="center">
-  <img src="tools/spat-textvqa-large.png">
+  <img src="tools/sam-textvqa-large.png">
 </p>
 
 
@@ -26,7 +26,7 @@ Create a fresh conda environment, and install all dependencies.
 ```text
 conda create -n spat python=3.6
 conda activate spat
-cd spat-textvqa
+cd sam-textvqa
 pip install -r requirements.txt
 ```
 
