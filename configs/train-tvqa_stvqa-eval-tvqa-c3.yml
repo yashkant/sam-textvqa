@@ -1,0 +1,100 @@
+name: TextVQA
+loss: textvqa
+
+
+# TextVQA
+textvqa_obj: "data/textvqa/tvqa_{}_obj.lmdb"
+textvqa_ocr: "data/textvqa/tvqa_{}_ocr.lmdb"
+textvqa_spatial_cache: "data/textvqa/tvqa_{}_spat_cache_reset.pkl"
+textvqa_imdb: "data/textvqa/tvqa_{}_imdb.npy"
+
+
+# STVQA
+stvqa_obj: "data/stvqa/stvqa_{}_obj.lmdb"
+stvqa_ocr: "data/stvqa/stvqa_{}_ocr.lmdb"
+stvqa_spatial_cache: "data/stvqa/stvqa_{}_spat_cache_reset.pkl"
+stvqa_imdb: "data/stvqa/stvqa_{}_imdb.npy"
+
+max_seq_length: 20
+max_obj_num: 100 # object features + avg feature
+max_ocr_num: 50 # ocr tokens + avg feature
+batch_size: 96
+train_split: train
+val_split: val
+lr: 0.0001
+num_epoch: 100
+debug: false
+max_grad_norm: 0.25
+model_type: m4c_spatial
+optim: Adam
+lr_decay_iters: [14000, 19000]
+lr_decay: 0.1
+warmup_factor: 0.2
+warmup_iters: 1000
+vocab_type: 5k
+metric: textvqa
+num_workers: 16
+clean_answers: true
+dynamic_sampling: true
+train_on: ["stvqa", "textvqa"]
+val_on: ["textvqa"]
+test_on: ["textvqa"]
+distance_threshold: 0.5
+mix_list: [none, none, share3, share3, share3, share3]
+output_dir: save
+seed: 0
+
+SA-M4C:
+  num_hidden_layers: 2
+  num_spatial_layers: 4
+  heads_type: mix
+  # Below list defines type of attention layers to use [spatial or normal]
+  layer_type_list: [ n,n,s,s,s,s ]
+  # Below list defines context of attention heads to use
+  mix_list: [none, none, share3, share3, share3, share3]
+  obj_drop: 0.1
+  ocr_drop: 0.1
+  hidden_size: 768
+  num_spatial_relations: 12
+  type_vocab_size: 2
+  vocab_size: 30522
+  textvqa_vocab_size: 3998
+  pooling_method: "mul"
+  ptr_query_size: 768
+  ocr_feature_size: 3002
+  obj_feature_size: 2048
+  finetune_ocr_obj: false
+  use_phoc_fasttext: true
+  normalize: true
+  lr_scale_mmt: 1.0
+  num_decoding_steps: 12
+  max_obj_num: 100
+  max_ocr_num: 50
+  max_seq_length: 20
+  beam_size: 1  # while training
+  #  Quadrants (QUE + OCR-OBJ + DEC)
+  #  1 | 2 | 3
+  #  ---------
+  #  4 | 5 | 6
+  #  ---------
+  #  7 | 8 | 9
+  attention_mask_quadrants: [1,2]
+
+
+TextBERT:
+  lr_scale_text_bert: 0.1
+  num_hidden_layers: 3
+  text_bert_init_from_bert_base: true
+  vocab_size: 30522
+
+
+Vocabs:
+  vocab5k: "data/vocabs/fixed_answer_vocab_textvqa_5k.txt"
+  vocab5k_stvqa: "data/vocabs/fixed_answer_vocab_stvqa_5k.txt"
+
+
+Evaluation:
+  textvqa_val: "data/evaluation/tvqa_eval_df.pkl"
+  textvqa_test: "data/evaluation/tvqa_eval_df_test.pkl"
+  stvqa_val: "data/evaluation/stvqa_eval_df.pkl"
+  stvqa_test: "data/evaluation/stvqa_eval_df_test.pkl"
