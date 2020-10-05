@@ -75,7 +75,7 @@ from collections import defaultdict
 import numpy as np
 import torch
 
-from spat.spatial_utils import build_graph_using_normalized_boxes
+from sam.spatial_utils import build_graph_using_normalized_boxes
 from tools.registry import registry
 
 from ..phoc import build_phoc

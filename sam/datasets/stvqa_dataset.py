@@ -4,7 +4,7 @@ import os
 import _pickle as cPickle
 from torch.utils.data import Dataset
 
-from spat.datasets.textvqa_dataset import ImageDatabase, TextVQADataset
+from sam.datasets.textvqa_dataset import ImageDatabase, TextVQADataset
 
 from ._image_features_reader import ImageFeaturesH5Reader
 from .processors import *

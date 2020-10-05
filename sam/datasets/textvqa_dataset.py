@@ -7,7 +7,7 @@ from easydict import EasyDict as edict
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from spat.spatial_utils import torch_broadcast_adj_matrix
+from sam.spatial_utils import torch_broadcast_adj_matrix
 from tools.objects_to_byte_tensor import enc_obj2bytes
 
 from ._image_features_reader import ImageFeaturesH5Reader

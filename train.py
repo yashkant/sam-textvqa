@@ -12,9 +12,9 @@ from easydict import EasyDict as edict
 from tqdm import tqdm
 
 from evaluator import Evaluator
-from spat.sa_m4c import SAM4C, BertConfig
-from spat.task_utils import (clip_gradients, forward_model,
-                             get_optim_scheduler, load_datasets)
+from sam.sa_m4c import SAM4C, BertConfig
+from sam.task_utils import (clip_gradients, forward_model,
+                            get_optim_scheduler, load_datasets)
 from tools.registry import registry
 
 logging.basicConfig(

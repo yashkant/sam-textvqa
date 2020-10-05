@@ -8,8 +8,8 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from spat.datasets.metrics import STVQAANLSEvaluator, TextVQAAccuracyEvaluator
-from spat.task_utils import forward_model
+from sam.datasets.metrics import STVQAANLSEvaluator, TextVQAAccuracyEvaluator
+from sam.task_utils import forward_model
 from tools.registry import registry
 
 logging.basicConfig(

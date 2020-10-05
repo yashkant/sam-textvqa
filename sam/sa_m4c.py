@@ -10,8 +10,8 @@ from pytorch_transformers.modeling_bert import (BertConfig, BertEmbeddings,
                                                 BertPreTrainedModel)
 from torch import nn
 
-from spat.beam_search import BeamSearch
-from spat.textvqa_encoders import ImageEncoder
+from sam.beam_search import BeamSearch
+from sam.textvqa_encoders import ImageEncoder
 from tools.registry import registry
 
 logger = logging.getLogger(__name__)

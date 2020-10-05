@@ -9,8 +9,8 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import ConcatDataset, DataLoader, RandomSampler
 
-from spat.datasets import DatasetMapTrain
-from spat.datasets.metrics import STVQAAccuracy, TextVQAAccuracy
+from sam.datasets import DatasetMapTrain
+from sam.datasets.metrics import STVQAAccuracy, TextVQAAccuracy
 from tools.registry import registry
 
 logger = logging.getLogger(__name__)
