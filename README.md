@@ -57,6 +57,7 @@ python train.py \
 --config config.yml \
 --tag experiment-name
 ```
+**Resources Used**: We ran all the experiments on 2 Titan Xp gpus. 
 
 ## Citation
 ```
