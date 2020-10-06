@@ -102,8 +102,6 @@ class Evaluator:
             os.path.dirname(self.checkpoint_path),
             f"evalai_{split}_beam_{beam_size}.json",
         )
-        # df_file_vqa = os.path.join(os.path.dirname(self.checkpoint_path), f'dataframe_vqa_{split}_beam_{beam_size}.df')
-        # df_file_anls = os.path.join(os.path.dirname(self.checkpoint_path), f'dataframe_anls_{split}_beam_{beam_size}.df')
 
         # EvalAI/ST-VQA file
         answer_dict = []
@@ -118,11 +116,7 @@ class Evaluator:
             json.dump(answer_dict, f)
         print(f"Dumping file: {evalai_file}")
 
-        # # Accuracies DF
-        # accuracies_vqa['accuracies_df'].to_json(df_file_vqa)
-        # accuracies_anls['accuracies_df'].to_json(df_file_anls)
-
-    def run_model(self, beam_size, split, short_eval=False):
+    def run_model(self, beam_size, split):
         # set beam-size
         self.model.module.set_beam_size(beam_size)
 
@@ -142,7 +136,6 @@ class Evaluator:
                 save_keys = ["question_id", "topkscores", "complete_seqs"]
                 for key in save_keys:
                     predictions[key].append(batch[key])
-                break
 
         self.model.train()
         return predictions
@@ -224,8 +217,6 @@ def anls_calculate(batch_dict, vocab):
     answer_space_size = len(vocab)
 
     predictions = []
-
-    # TODO: This is a single list - remove for loop
     for idx, question_id in enumerate([batch_dict["question_id"]]):
         context_tokens = ocr_tokens_enc[idx]
         answer_words = []
