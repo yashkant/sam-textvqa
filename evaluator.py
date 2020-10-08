@@ -49,19 +49,35 @@ class Evaluator:
                     vocab.append(line.strip())
             self.vocabs[task] = vocab
 
+    def evaluate_no_beam(self, split):
+        evalai_file = os.path.join(
+            os.path.dirname(self.checkpoint_path),
+            f"evalai_{split}.json",
+        )
+
+        evalai_preds = self.run_model_no_beam(split)
+
+        with open(evalai_file, "w") as f:
+            json.dump(evalai_preds, f)
+
+        print(f"Dumping file: {evalai_file}")
+
+
+
     def evaluate(self, split, beam_size):
         eval_df_key = f"{registry['val_on'][0]}_{split}"
         eval_df = pd.read_pickle(registry["Evaluation"][eval_df_key])
         logger.info(f"Processing split: {split}")
-        predictions = self.run_model(beam_size, split, short_eval=True)
+
+        predictions = self.run_model(beam_size, split)
         predictions["complete_seqs"] = np.concatenate(
-            [x.reshape(-1, 12) for x in predictions["complete_seqs"][0].cpu()], axis=0
+            [x.cpu().reshape(-1, 12) for x in predictions["complete_seqs"]], axis=0
         ).tolist()
         predictions["topkscores"] = np.concatenate(
-            [predictions["topkscores"][0].cpu()], axis=0
+            [x.cpu() for x in predictions["topkscores"]], axis=0
         ).tolist()
         predictions["question_id"] = np.concatenate(
-            [predictions["question_id"][0].cpu()], axis=0
+            [x.cpu() for x in predictions["question_id"]], axis=0
         ).tolist()
 
         if "answers" not in eval_df:
@@ -112,8 +128,10 @@ class Evaluator:
                     "answer": pred["pred_answer"].strip(),
                 }
             )
+
         with open(evalai_file, "w") as f:
             json.dump(answer_dict, f)
+
         print(f"Dumping file: {evalai_file}")
 
     def run_model(self, beam_size, split):
@@ -136,9 +154,26 @@ class Evaluator:
                 save_keys = ["question_id", "topkscores", "complete_seqs"]
                 for key in save_keys:
                     predictions[key].append(batch[key])
+                break
 
         self.model.train()
         return predictions
+
+    def run_model_no_beam(self, split):
+        scores, batch_sizes = [], []
+        predictions = []
+        self.model.eval()
+        with torch.no_grad():
+            for batch_dict in tqdm(self.dataloaders[split], desc=f"Eval on {split}"):
+                loss, score, batch_size, batch_predictions = forward_model(
+                    {"loss": "textvqa", "metric": "textvqa"}, self.device, self.model, batch_dict=batch_dict
+                )
+                scores.append(score * batch_size)
+                batch_sizes.append(batch_size)
+                predictions.extend(batch_predictions)
+
+        evalai_preds = [{"question_id": x["question_id"], "answer": x["pred_answer"]} for x in predictions]
+        return evalai_preds
 
     def restore_checkpoint(self):
         checkpoint = torch.load(self.checkpoint_path, map_location="cpu")

@@ -65,7 +65,7 @@ class TextVQAAccuracy:
         accuracy = torch.tensor(accuracy).cuda()
 
         self.accuracies.append((accuracy, len(batch_dict["question_id"])))
-        return accuracy, pred_scores
+        return accuracy, pred_scores, predictions
 
 
 class STVQAANLS(TextVQAAccuracy):

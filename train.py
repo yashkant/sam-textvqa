@@ -32,18 +32,18 @@ def get_config():
         "--num_train_epochs",
         default=100,
         type=int,
-        help="Total number of training epochs to perform.",
+        help="Total training epochs",
     )
     parser.add_argument(
-        "--seed", type=int, default=0, help="random seed for initialization"
+        "--seed", type=int, default=0, help="Random seed for reproducibility"
     )
-    parser.add_argument("--config", required=True, type=str, help="Config file")
+    parser.add_argument("--config", required=True, type=str, help="Experiment configuration file")
 
     parser.add_argument(
-        "--tag", default="debug", type=str, help="tag for the experiment", required=True
+        "--tag", type=str, help="Experiment folder name", default="debug"
     )
 
-    parser.add_argument("--pretrained_eval", default="", help="")
+    parser.add_argument("--pretrained_eval", default="", help="Path of pre-trained checkpoint")
     args = parser.parse_args()
 
     # Load configuration
@@ -63,7 +63,7 @@ def get_config():
 
     # Build save path
     save_path = os.path.join(task_cfg["output_dir"], args.tag)
-    if not os.path.exists(save_path):
+    if not os.path.exists(save_path) and args.pretrained_eval != "":
         os.makedirs(save_path)
 
     # Dump all configs
@@ -89,7 +89,6 @@ def main():
 
     dataloaders = load_datasets(task_cfg, ["train", "val", "test"])
 
-    median_num_iter = len(dataloaders["train"])
     mmt_config = BertConfig.from_dict(task_cfg["SA-M4C"])
     text_bert_config = BertConfig.from_dict(task_cfg["TextBERT"])
     model = SAM4C(mmt_config, text_bert_config)
@@ -112,9 +111,6 @@ def main():
     if n_gpu > 1:
         model = torch.nn.DataParallel(model)
 
-    if task_cfg["debug"]:
-        median_num_iter = 1000
-
     # When running only evaluation
     if args.pretrained_eval != "":
         logger.info(
@@ -125,6 +121,7 @@ def main():
     # This validation score is used for model-saving.
     best_val_step, best_val_score = -1, -1
     loss_values, score_values = [], []
+    median_num_iter = len(dataloaders["train"])
 
     # Train loop
     model.train()
@@ -133,7 +130,7 @@ def main():
             assert model.training
             iter_id = start_iter_id + step + (epoch_id * median_num_iter)
 
-            loss, score, _ = forward_model(
+            loss, score, _, _ = forward_model(
                 task_cfg, device, model, dataloaders, "train"
             )
 
@@ -183,6 +180,7 @@ def main():
                     "optimizer_state_dict": optimizer.state_dict(),
                     "warmup_scheduler_state_dict": warmup_scheduler.state_dict(),
                     "global_step": global_step,
+                    "current_val_score": curr_val_score,
                     "epoch_id": epoch_id,
                 },
                 checkpoint_path,
@@ -204,7 +202,7 @@ def evaluate(
     model.eval()
     with torch.no_grad():
         for batch_dict in tqdm(dataloaders["val"], desc="Validation"):
-            loss, score, batch_size = forward_model(
+            loss, score, batch_size, _ = forward_model(
                 task_cfg, device, model, batch_dict=batch_dict
             )
             scores.append(score * batch_size)
@@ -216,11 +214,12 @@ def evaluate(
 
 if __name__ == "__main__":
     checkpoint_path, model, dataloaders = main()
+
     assert os.path.exists(checkpoint_path)
     task = registry["val_on"][0]
     evaluator = Evaluator(checkpoint_path, model, dataloaders, task)
 
-    # Evaluate w/ beam-search
-    for beam_size in [5, 1]:
+    # Beam search code has developed a problem and will be fixed in future!
+    for beam_size in [1]:
         for split in ["test", "val"]:
-            evaluator.evaluate(split=split, beam_size=beam_size)
+            evaluator.evaluate_no_beam(split=split)

@@ -366,6 +366,9 @@ class TextVQADataset(Dataset):
         else:
             # Empty placeholder
             entry["train_prev_inds"] = torch.zeros(12, dtype=torch.long)
+            entry["train_loss_mask"] = torch.zeros(12, dtype=torch.float)
+            entry["answers"] = ["nothing-here"] * 10
+            entry["targets"] = torch.zeros(12, self.processors.answer_processor.get_vocab_size(), dtype=torch.float)
 
         if self.needs_spatial:
             # In the first iteration expand all the spatial relation matrices

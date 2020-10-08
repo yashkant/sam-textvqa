@@ -128,11 +128,11 @@ def forward_model(
         batch_dict["train_loss_mask"],
     )
     textvqa_metric = MetricsMap[task_cfg["metric"]]
-    batch_acc, batch_scores = textvqa_metric.calculate(
+    batch_acc, batch_scores, predictions = textvqa_metric.calculate(
         batch_dict, batch_dict["textvqa_scores"]
     )
 
-    return loss, batch_acc, batch_size
+    return loss, batch_acc, batch_size, predictions
 
 
 def get_loader(task_cfg, tokenizer, split):
