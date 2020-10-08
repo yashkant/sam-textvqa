@@ -25,6 +25,8 @@ data
 │   ├── fixed_answer_vocab_stvqa_5k.txt
 │   └── fixed_answer_vocab_textvqa_5k.txt
 |
+├── pretrained_models/best_model.tar        # pretrained model
+|
 └── evaluation/                     # required for evaluation 
     ├── stvqa_eval_df_test.pkl
     ├── stvqa_eval_df.pkl
