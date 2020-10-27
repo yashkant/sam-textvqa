@@ -63,7 +63,7 @@ def get_config():
 
     # Build save path
     save_path = os.path.join(task_cfg["output_dir"], args.tag)
-    if not os.path.exists(save_path) and args.pretrained_eval != "":
+    if not os.path.exists(save_path) and args.pretrained_eval == "":
         os.makedirs(save_path)
 
     # Dump all configs
