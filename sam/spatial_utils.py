@@ -189,12 +189,18 @@ def build_graph_using_normalized_boxes(
                             label_j = label_i - math.pi
                         # goes from [1-8] + 3 -> [4-11]
                         # if (adj_matrix_shared["1"][i, j] > 0):
-                        adj_matrix_shared["1"][i, j] = (
-                            int(np.ceil(label_i / (math.pi / 4))) + 3
-                        )
-                        adj_matrix_shared["1"][j, i] = (
-                            int(np.ceil(label_j / (math.pi / 4))) + 3
-                        )
+                        if math.isnan(np.ceil(label_i / (math.pi / 4))):
+                            adj_matrix_shared["1"][i, j] = 4
+                        else:
+                            adj_matrix_shared["1"][i, j] = (
+                                int(np.ceil(label_i / (math.pi / 4))) + 3
+                            )
+                        if math.isnan(np.ceil(label_j / (math.pi / 4))):
+                            adj_matrix_shared["1"][j, i] = 4
+                        else:
+                            adj_matrix_shared["1"][j, i] = (
+                                int(np.ceil(label_j / (math.pi / 4))) + 3
+                            )
 
                         # fill in share spatial-matrices
                         for key in adj_matrix_shared.keys():
